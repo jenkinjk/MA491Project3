@@ -1,27 +1,37 @@
 import java.util.ArrayList;
 
 
-public class optimalityCalculator {
+public class OptimalityCalculator {
 	
 	private ArrayList<Trip> tripPlan; 
 
-	public float calcValue(float alpha, float beta, float gamma, float delta){
-		return alpha * calcNumber() + beta * calcContact() + gamma* calcSpeedDiversity() + delta*calcTypeDiversity();
+	public OptimalityCalculator(ArrayList<Trip> trips) {
+		this.tripPlan = trips;
 	}
 
-	private float calcTypeDiversity() {
+	public double calcValue(double alpha, double beta, double gamma, double delta, double epsilon){
+		//Amount of time on the river should be taken into account
+		return alpha * calcNumber() - beta * calcContact() + gamma* calcSpeedDiversity() + delta*calcTypeDiversity() - epsilon*calcTimeOnRiver();
+	}
+
+	private double calcTimeOnRiver() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	private double calcTypeDiversity() {
 		int paddles =0, motor = 0;
 		for(Trip t: tripPlan){
-			if(t.type.equals("Oar")){
+			if(t.getType().equals("Oar")){
 				paddles=paddles+1;
 			}else
 				motor=motor+1;
 		}
-		float ratio = Math.min(paddles/motor, motor/paddles);
+		double ratio = Math.min(paddles/motor, motor/paddles);
 		return ratio;
 	}
 
-	private float calcSpeedDiversity() {
+	private double calcSpeedDiversity() {
 		ArrayList<Integer> lengths = new ArrayList<Integer>();
 		for(Trip t: tripPlan){
 			lengths.add(t.calcLength());
@@ -29,11 +39,56 @@ public class optimalityCalculator {
 		return calcDiversity(lengths);
 	}
 
-	private float calcDiversity(ArrayList<Integer> lengths) {
-		return 1;
+	private double calcDiversity(ArrayList<Integer> lengths) {
+		//Simple test to see how many standard devs the max is, as is the min.
+		int max = findMax(lengths), min = findMin(lengths);
+		double stdMax = (max-getMean(lengths))/getStdDev(lengths);
+		double stdMin = (min - getMean(lengths))/getStdDev(lengths);
+		double result = 1/stdMax + 1/stdMin;
+		return result;
+	}
+	
+	private int findMax(ArrayList<Integer> lengths) {
+		int max = 0;
+		for(int i: lengths){
+			if(i>max)
+				max = i;
+		}
+		return max;
 	}
 
-	private float calcContact() {
+	private int findMin(ArrayList<Integer> lengths) {
+		int min = 20;
+		for(int i: lengths){
+			if(i<min)
+				min = i;
+		}
+		return min;
+	}
+
+	double getMean(ArrayList<Integer> lengths)
+    {
+        double sum = 0.0;
+        for(double a : lengths)
+            sum += a;
+        return sum/lengths.size();
+    }
+
+    double getVariance(ArrayList<Integer> lengths)
+    {
+        double mean = getMean(lengths);
+        double temp = 0;
+        for(double a :lengths)
+            temp += (mean-a)*(mean-a);
+        return temp/lengths.size();
+    }
+
+    double getStdDev(ArrayList<Integer> lengths)
+    {
+        return Math.sqrt(getVariance(lengths));
+    }
+
+	private double calcContact() {
 		int overlap = 0;
 		for(Trip t: tripPlan){
 			for(Trip t2: tripPlan){
@@ -49,7 +104,7 @@ public class optimalityCalculator {
 		return 0;
 	}
 
-	private float calcNumber() {
+	private double calcNumber() {
 		return tripPlan.size();
 	}
 	
