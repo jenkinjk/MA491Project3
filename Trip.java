@@ -18,7 +18,7 @@ public class Trip {
 		this.startMonth = Integer.valueOf(startDate.substring(0, startDate.lastIndexOf('/')));
 		this.setEndMonth(Integer.valueOf(endDate.substring(0, endDate.lastIndexOf('/'))));
 		this.startDay = Integer.valueOf(startDate.substring(startDate.lastIndexOf('/')+1, startDate.length()));
-		this.setEndDay(Integer.valueOf(startDate.substring(endDate.lastIndexOf('/')+1, endDate.length())));
+		this.setEndDay(Integer.valueOf(endDate.substring(endDate.lastIndexOf('/')+1, endDate.length())));
 		this.monthMap = new HashMap<Integer, Integer>();
 		this.monthMap.put(4, 30);
 		this.monthMap.put(5, 31);
@@ -62,7 +62,7 @@ public class Trip {
 		}if(this.getEndMonth() < endMonth){
 			return true;
 		}else{
-			if(this.getEndDay() > endDay){
+			if(this.getEndDay() >= endDay){
 				return false;
 			}else{
 				return true;
@@ -92,6 +92,29 @@ public class Trip {
 	
 	public void setContact(int i){
 		this.contact = i;
+	}
+
+	public int getStartMonth() {
+		return this.startMonth;
+	}
+	public int getStartDay() {
+		return this.startDay;
+	}
+
+	public int getEndDateInt() {
+		int result = this.endDay;
+		for(int i = 4; i < this.endMonth; i++){
+			result += this.monthMap.get(i);
+		}
+		return result;
+	}
+	
+	public int getStartDateInt() {
+		int result = this.startDay;
+		for(int i = 4; i < this.startMonth; i++){
+			result += this.monthMap.get(i);
+		}
+		return result;
 	}
 
 }
